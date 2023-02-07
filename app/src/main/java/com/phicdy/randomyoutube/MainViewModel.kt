@@ -18,7 +18,7 @@ class MainViewModel : ViewModel() {
     fun fetch() {
         viewModelScope.launch(Dispatchers.IO) {
             val response = repository.fetch()
-            mutableState.value = MainState(response?.body?.string())
+            mutableState.value = MainState(response.toString())
         }
     }
 }
