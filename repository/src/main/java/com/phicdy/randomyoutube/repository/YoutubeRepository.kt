@@ -1,6 +1,7 @@
 package com.phicdy.randomyoutube.repository
 
 import android.util.Log
+import com.phicdy.randomyoutube.domain.model.Video
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.Dispatchers
@@ -10,7 +11,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 
 class YoutubeRepository {
 
-    suspend fun fetch(): YoutubePlaylistItemsResponse? = withContext(Dispatchers.IO) {
+    suspend fun fetch(): List<Video>? = withContext(Dispatchers.IO) {
         val channelId = "UCFBjsYvwX7kWUjQoW7GcJ5A"
         val moshi = Moshi.Builder()
             .add(KotlinJsonAdapterFactory())
@@ -28,13 +29,20 @@ class YoutubeRepository {
                 channelId = channelId,
                 maxResults = 5
             )
-            api.fetchPlaylistItems(
+            val videoResponse = api.fetchPlaylistItems(
                 apiKey = BuildConfig.YOUTUBE_API_KEY,
                 part = "id,snippet",
                 playlistId = response.items.first().contentDetails.relatedPlaylists.uploads,
                 maxResults = 50,
                 pageToken = null
             )
+            val list = videoResponse.items.map { item ->
+                Video(
+                    id = item.snippet.resourceId.videoId,
+                    title = item.snippet.title
+                )
+            }
+            return@withContext list
         } catch (e: Exception) {
             Log.e("phicdyphicdy", e.toString())
             null
