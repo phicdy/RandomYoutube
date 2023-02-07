@@ -1,10 +1,15 @@
 package com.phicdy.randomyoutube
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -30,7 +35,15 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Greeting(viewModel.state)
+                    VideoList(
+                        state = viewModel.state,
+                        onVideoClicked = { videoId ->
+                            startActivity(Intent(Intent.ACTION_VIEW).apply {
+                                data = Uri.parse("vnd.youtube:$videoId")
+                                putExtra("VIDEO_ID", videoId);
+                            })
+                        }
+                    )
                 }
             }
         }
@@ -45,11 +58,22 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: State<MainState>, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello ${name.value.body}!",
-        modifier = modifier
-    )
+fun VideoList(
+    modifier: Modifier = Modifier,
+    state: State<MainState>,
+    onVideoClicked: (String) -> Unit
+) {
+    LazyColumn {
+        items(
+            items = state.value.videos,
+            key = { video -> video.id }
+        ) { video ->
+            Text(
+                text = video.title,
+                modifier = modifier.clickable { onVideoClicked(video.id) }
+            )
+        }
+    }
 }
 
 @Preview(showBackground = true)

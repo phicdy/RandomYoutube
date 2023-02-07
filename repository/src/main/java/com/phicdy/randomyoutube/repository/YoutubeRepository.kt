@@ -10,7 +10,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 
 class YoutubeRepository {
 
-    suspend fun fetch(): YoutubeChannelResponse? = withContext(Dispatchers.IO) {
+    suspend fun fetch(): YoutubePlaylistItemsResponse? = withContext(Dispatchers.IO) {
         val channelId = "UCFBjsYvwX7kWUjQoW7GcJ5A"
         val moshi = Moshi.Builder()
             .add(KotlinJsonAdapterFactory())
@@ -22,11 +22,18 @@ class YoutubeRepository {
         val api = retrofit.create(YoutubeApi::class.java)
 
         return@withContext try {
-            api.fetchChannel(
+            val response = api.fetchChannel(
                 apiKey = BuildConfig.YOUTUBE_API_KEY,
                 part = "id,snippet,brandingSettings,contentDetails",
                 channelId = channelId,
                 maxResults = 5
+            )
+            api.fetchPlaylistItems(
+                apiKey = BuildConfig.YOUTUBE_API_KEY,
+                part = "id,snippet",
+                playlistId = response.items.first().contentDetails.relatedPlaylists.uploads,
+                maxResults = 50,
+                pageToken = null
             )
         } catch (e: Exception) {
             Log.e("phicdyphicdy", e.toString())

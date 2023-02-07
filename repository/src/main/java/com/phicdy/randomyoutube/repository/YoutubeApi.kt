@@ -11,5 +11,14 @@ internal interface YoutubeApi {
         @Query("part") part: String,
         @Query("id") channelId: String,
         @Query("maxResults") maxResults: Int
-    ) : YoutubeChannelResponse
+    ): YoutubeChannelResponse
+
+    @GET("youtube/v3/playlistItems")
+    suspend fun fetchPlaylistItems(
+        @Query("key") apiKey: String,
+        @Query("part") part: String,
+        @Query("playlistId") playlistId: String,
+        @Query("maxResults") maxResults: Int,
+        @Query("pageToken") pageToken: String?,
+    ): YoutubePlaylistItemsResponse
 }

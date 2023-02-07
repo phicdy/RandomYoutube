@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
 
-    private val mutableState = mutableStateOf(MainState(""))
+    private val mutableState = mutableStateOf(MainState(listOf()))
     val state: State<MainState> = mutableState
 
     private val repository = YoutubeRepository()
@@ -18,7 +18,13 @@ class MainViewModel : ViewModel() {
     fun fetch() {
         viewModelScope.launch(Dispatchers.IO) {
             val response = repository.fetch()
-            mutableState.value = MainState(response.toString())
+            val list = response?.items?.map { item ->
+                MainState.Video(
+                    id = item.snippet.resourceId.videoId,
+                    title = item.snippet.title
+                )
+            } ?: return@launch
+            mutableState.value = MainState(list)
         }
     }
 }
