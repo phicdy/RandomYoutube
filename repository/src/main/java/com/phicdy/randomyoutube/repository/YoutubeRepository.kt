@@ -29,20 +29,27 @@ class YoutubeRepository {
                 channelId = channelId,
                 maxResults = 5
             )
-            val videoResponse = api.fetchPlaylistItems(
-                apiKey = BuildConfig.YOUTUBE_API_KEY,
-                part = "id,snippet",
-                playlistId = response.items.first().contentDetails.relatedPlaylists.uploads,
-                maxResults = 50,
-                pageToken = null
-            )
-            val list = videoResponse.items.map { item ->
-                Video(
-                    id = item.snippet.resourceId.videoId,
-                    title = item.snippet.title
+            val result = mutableListOf<Video>()
+            var nextToken: String? = "start"
+            while (!nextToken.isNullOrBlank()) {
+                val videoResponse = api.fetchPlaylistItems(
+                    apiKey = BuildConfig.YOUTUBE_API_KEY,
+                    part = "id,snippet",
+                    playlistId = response.items.first().contentDetails.relatedPlaylists.uploads,
+                    maxResults = 50,
+                    pageToken = if (nextToken == "start") null else nextToken
                 )
+                for (item in videoResponse.items) {
+                    result.add(
+                        Video(
+                            id = item.snippet.resourceId.videoId,
+                            title = item.snippet.title
+                        )
+                    )
+                }
+                nextToken = videoResponse.nextPageToken
             }
-            return@withContext list
+            return@withContext result
         } catch (e: Exception) {
             Log.e("phicdyphicdy", e.toString())
             null

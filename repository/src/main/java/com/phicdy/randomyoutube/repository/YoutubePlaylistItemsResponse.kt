@@ -35,7 +35,7 @@ data class YoutubePlaylistItemsItemSnippetThumbnails(
     val default: YoutubePlaylistItemsItemSnippetThumbnail,
     val medium: YoutubePlaylistItemsItemSnippetThumbnail,
     val high: YoutubePlaylistItemsItemSnippetThumbnail,
-    val standard: YoutubePlaylistItemsItemSnippetThumbnail,
+    val standard: YoutubePlaylistItemsItemSnippetThumbnail?,
     val maxres: YoutubePlaylistItemsItemSnippetThumbnail?,
 )
 
