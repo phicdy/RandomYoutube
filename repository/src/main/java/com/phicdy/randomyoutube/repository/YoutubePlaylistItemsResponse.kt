@@ -3,7 +3,7 @@ package com.phicdy.randomyoutube.repository
 data class YoutubePlaylistItemsResponse(
     val kind: String,
     val etag: String,
-    val nextPageToken: String,
+    val nextPageToken: String?,
     val prevPageToken: String?,
     val items: List<YoutubePlaylistItemsItem>,
     val pageInfo: YoutubePlaylistPageInfo

@@ -4,6 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.phicdy.randomyoutube.domain.model.Video
 import com.phicdy.randomyoutube.repository.YoutubeRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,7 +20,7 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val response = repository.fetch()
             val list = response?.items?.map { item ->
-                MainState.Video(
+                Video(
                     id = item.snippet.resourceId.videoId,
                     title = item.snippet.title
                 )
