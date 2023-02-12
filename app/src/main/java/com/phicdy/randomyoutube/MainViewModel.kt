@@ -17,7 +17,7 @@ class MainViewModel(
 ) : ViewModel() {
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.Main) {
             repository.fetch().collect { videoList ->
                 mutableState.value = MainState(videoList, null, false)
             }
@@ -27,11 +27,11 @@ class MainViewModel(
     private val mutableState = mutableStateOf(MainState(listOf(), null, false))
     val state: State<MainState> = mutableState
 
-    fun fetch() {
-//        viewModelScope.launch(Dispatchers.IO) {
-//            val response = repository.sync() ?: return@launch
-//            mutableState.value = MainState(response, null, false)
-//        }
+    fun sync() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val response = repository.sync() ?: return@launch
+            mutableState.value = MainState(response, null, false)
+        }
     }
 
     fun onSelectRandomVideo(video: Video) {

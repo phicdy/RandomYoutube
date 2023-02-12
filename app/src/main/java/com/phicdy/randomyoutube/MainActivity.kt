@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
@@ -26,10 +27,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.lifecycleScope
 import com.phicdy.randomyoutube.domain.model.Video
 import com.phicdy.randomyoutube.ui.theme.RandomYoutubeTheme
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -37,10 +36,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        lifecycleScope.launch {
-            viewModel.fetch()
-        }
         setContent {
             RandomYoutubeTheme {
                 // A surface container using the 'background' color from the theme
@@ -59,6 +54,9 @@ class MainActivity : ComponentActivity() {
                         onRandomButtonClicked = { videos ->
                             val randomIndex = (videos.indices).random()
                             viewModel.onSelectRandomVideo(videos[randomIndex])
+                        },
+                        onSyncButtonClicked = {
+                            viewModel.sync()
                         },
                         onDismissDialog = {
                             viewModel.onDismissDialog()
@@ -82,6 +80,7 @@ fun VideoList(
     state: State<MainState>,
     onVideoClicked: (Video) -> Unit,
     onRandomButtonClicked: (List<Video>) -> Unit,
+    onSyncButtonClicked: () -> Unit,
     onDismissDialog: () -> Unit,
     onOkClicked: (String) -> Unit,
 ) {
@@ -89,6 +88,7 @@ fun VideoList(
         videos = state.value.videos,
         onVideoClicked = onVideoClicked,
         onRandomButtonClicked = onRandomButtonClicked,
+        onSyncButtonClicked = onSyncButtonClicked,
         onDismissDialog = onDismissDialog,
         onOkClicked = onOkClicked,
         randomSelectedVideo = state.value.randomSelectedVideo,
@@ -102,24 +102,40 @@ fun VideoList(
     videos: List<Video>,
     onVideoClicked: (Video) -> Unit,
     onRandomButtonClicked: (List<Video>) -> Unit,
+    onSyncButtonClicked: () -> Unit,
     onDismissDialog: () -> Unit,
     onOkClicked: (String) -> Unit,
     randomSelectedVideo: Video?,
     showConfirmDialog: Boolean
 ) {
     Column {
-        Button(
-            modifier = modifier
-                .width(96.dp)
-                .height(48.dp),
-            onClick = { onRandomButtonClicked(videos) }
-        ) {
-            Text(
-                modifier = modifier,
-                textAlign = TextAlign.Center,
-                text = "Random",
-                fontSize = 12.sp
-            )
+        Row {
+            Button(
+                modifier = modifier
+                    .width(96.dp)
+                    .height(48.dp),
+                onClick = { onRandomButtonClicked(videos) }
+            ) {
+                Text(
+                    modifier = modifier,
+                    textAlign = TextAlign.Center,
+                    text = "Random",
+                    fontSize = 12.sp
+                )
+            }
+            Button(
+                modifier = modifier
+                    .width(96.dp)
+                    .height(48.dp),
+                onClick = { onSyncButtonClicked() }
+            ) {
+                Text(
+                    modifier = modifier,
+                    textAlign = TextAlign.Center,
+                    text = "Sync",
+                    fontSize = 12.sp
+                )
+            }
         }
         LazyColumn {
             items(
@@ -163,6 +179,7 @@ fun GreetingPreview() {
             videos = listOf(Video("hoge", "title"), Video("fuga", "title2")),
             onVideoClicked = {},
             onRandomButtonClicked = {},
+            onSyncButtonClicked = {},
             onDismissDialog = {},
             onOkClicked = {},
             randomSelectedVideo = null,
