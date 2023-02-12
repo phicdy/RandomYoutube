@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'com.google.devtools.ksp' version '1.8.0-1.0.8'
 }
 
 android {
@@ -47,6 +48,12 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation "com.squareup.retrofit2:converter-moshi:2.9.0"
     implementation 'com.squareup.moshi:moshi-kotlin:1.14.0'
+
+    implementation 'com.google.devtools.ksp:symbol-processing-api:1.8.0-1.0.8'
+
+    def room_version = "2.5.0"
+    implementation "androidx.room:room-runtime:$room_version"
+    ksp "androidx.room:room-compiler:$room_version"
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
