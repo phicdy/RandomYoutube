@@ -29,8 +29,7 @@ class MainViewModel(
 
     fun sync() {
         viewModelScope.launch(Dispatchers.IO) {
-            val response = repository.sync() ?: return@launch
-            mutableState.value = MainState(response, null, false)
+            repository.sync()
         }
     }
 

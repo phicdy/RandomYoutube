@@ -33,7 +33,7 @@ class YoutubeRepository(
         }
     }
 
-    suspend fun sync(): List<Video>? = withContext(Dispatchers.IO) {
+    suspend fun sync() = withContext(Dispatchers.IO) {
         val channelId = "UCFBjsYvwX7kWUjQoW7GcJ5A"
         val moshi = Moshi.Builder()
             .add(KotlinJsonAdapterFactory())
@@ -51,7 +51,6 @@ class YoutubeRepository(
                 channelId = channelId,
                 maxResults = 5
             )
-            val result = mutableListOf<Video>()
             var nextToken: String? = "start"
             while (!nextToken.isNullOrBlank()) {
                 val videoResponse = api.fetchPlaylistItems(
@@ -71,20 +70,10 @@ class YoutubeRepository(
                 }
                 db.videoDao().insertAll(list)
 
-                for (item in videoResponse.items) {
-                    result.add(
-                        Video(
-                            id = item.snippet.resourceId.videoId,
-                            title = item.snippet.title
-                        )
-                    )
-                }
                 nextToken = videoResponse.nextPageToken
             }
-            return@withContext result
         } catch (e: Exception) {
             Log.e("phicdyphicdy", e.toString())
-            null
         }
     }
 }
