@@ -1,6 +1,8 @@
 package com.phicdy.randomyoutube.repository
 
+import android.content.Context
 import android.util.Log
+import androidx.room.Room
 import com.phicdy.randomyoutube.domain.model.Video
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -9,7 +11,14 @@ import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
-class YoutubeRepository {
+class YoutubeRepository(
+    applicationContext: Context
+) {
+
+    private val db = Room.databaseBuilder(
+        applicationContext,
+        AppDatabase::class.java, "random_youtube_db"
+    ).build()
 
     suspend fun fetch(): List<Video>? = withContext(Dispatchers.IO) {
         val channelId = "UCFBjsYvwX7kWUjQoW7GcJ5A"
@@ -39,6 +48,16 @@ class YoutubeRepository {
                     maxResults = 50,
                     pageToken = if (nextToken == "start") null else nextToken
                 )
+                val list = videoResponse.items.map { item ->
+                    VideoEntity(
+                        id = item.snippet.resourceId.videoId,
+                        title = item.snippet.title,
+                        publishedAt = item.snippet.publishedAt,
+                        thumbnailUrl = item.snippet.thumbnails.default.url
+                    )
+                }
+                db.videoDao().insertAll(list)
+
                 for (item in videoResponse.items) {
                     result.add(
                         Video(
