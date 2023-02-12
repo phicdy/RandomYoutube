@@ -7,6 +7,8 @@ import com.phicdy.randomyoutube.domain.model.Video
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -20,7 +22,18 @@ class YoutubeRepository(
         AppDatabase::class.java, "random_youtube_db"
     ).build()
 
-    suspend fun fetch(): List<Video>? = withContext(Dispatchers.IO) {
+    fun fetch(): Flow<List<Video>> {
+        return db.videoDao().getAll().map { list ->
+            list.map {
+                Video(
+                    id = it.id,
+                    title = it.title,
+                )
+            }
+        }
+    }
+
+    suspend fun sync(): List<Video>? = withContext(Dispatchers.IO) {
         val channelId = "UCFBjsYvwX7kWUjQoW7GcJ5A"
         val moshi = Moshi.Builder()
             .add(KotlinJsonAdapterFactory())

@@ -16,14 +16,22 @@ class MainViewModel(
     private val repository: YoutubeRepository
 ) : ViewModel() {
 
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.fetch().collect { videoList ->
+                mutableState.value = MainState(videoList, null, false)
+            }
+        }
+    }
+
     private val mutableState = mutableStateOf(MainState(listOf(), null, false))
     val state: State<MainState> = mutableState
 
     fun fetch() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val response = repository.fetch() ?: return@launch
-            mutableState.value = MainState(response, null, false)
-        }
+//        viewModelScope.launch(Dispatchers.IO) {
+//            val response = repository.sync() ?: return@launch
+//            mutableState.value = MainState(response, null, false)
+//        }
     }
 
     fun onSelectRandomVideo(video: Video) {
