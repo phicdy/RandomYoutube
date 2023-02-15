@@ -19,12 +19,12 @@ class MainViewModel(
     init {
         viewModelScope.launch(Dispatchers.Main) {
             repository.fetch().collect { videoList ->
-                mutableState.value = MainState(videoList, null, false)
+                mutableState.value = MainState(videoList, listOf(), false)
             }
         }
     }
 
-    private val mutableState = mutableStateOf(MainState(listOf(), null, false))
+    private val mutableState = mutableStateOf(MainState(listOf(), listOf(), false))
     val state: State<MainState> = mutableState
 
     fun sync() {
@@ -33,14 +33,19 @@ class MainViewModel(
         }
     }
 
-    fun onSelectRandomVideo(video: Video) {
+    fun onSelectRandomVideo(videos: List<Video>) {
+        val list = ArrayList<Video>(50)
+        repeat(50) {
+            val randomIndex = (videos.indices).random()
+            list.add(videos[randomIndex])
+        }
         mutableState.value =
-            mutableState.value.copy(randomSelectedVideo = video, showConfirmDialog = true)
+            mutableState.value.copy(selectedVideos = list, showConfirmDialog = true)
     }
 
     fun onDismissDialog() {
         mutableState.value =
-            mutableState.value.copy(randomSelectedVideo = null, showConfirmDialog = false)
+            mutableState.value.copy(selectedVideos = listOf(), showConfirmDialog = false)
     }
 
     companion object {
