@@ -28,6 +28,8 @@ class YoutubeRepository(
                 Video(
                     id = it.id,
                     title = it.title,
+                    publishedAt = it.publishedAt,
+                    thumbnailUrl = it.thumbnailUrl
                 )
             }
         }

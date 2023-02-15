@@ -21,11 +21,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.phicdy.randomyoutube.domain.model.Video
 import com.phicdy.randomyoutube.ui.theme.RandomYoutubeTheme
 
@@ -122,11 +124,22 @@ fun VideoList(
                 items = selectedVideos.ifEmpty { videos },
                 key = { index, video -> "$index${video.id}" }
             ) { _, video ->
-                Text(
-                    text = video.title,
-                    modifier = modifier.clickable { onVideoClicked(video) }
-                        .padding(4.dp)
-                )
+                Column(Modifier.padding(4.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        AsyncImage(
+                            modifier = modifier.width(96.dp).height(96.dp),
+                            model = video.thumbnailUrl,
+                            contentDescription = null
+                        )
+                        Text(
+                            text = video.title,
+                            modifier = modifier
+                                .clickable { onVideoClicked(video) }
+                                .padding(start = 8.dp)
+                        )
+                    }
+                    Text(text = video.publishedAt)
+                }
             }
         }
     }
@@ -137,7 +150,10 @@ fun VideoList(
 fun GreetingPreview() {
     RandomYoutubeTheme {
         VideoList(
-            videos = listOf(Video("hoge", "title"), Video("fuga", "title2")),
+            videos = listOf(
+                Video("hoge", "title", "2023/01/01", ""),
+                Video("fuga", "title2", "2023/01/01", "")
+            ),
             onVideoClicked = {},
             onRandomButtonClicked = {},
             onSyncButtonClicked = {},
