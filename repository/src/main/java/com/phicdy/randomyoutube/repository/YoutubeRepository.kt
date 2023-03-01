@@ -67,7 +67,8 @@ class YoutubeRepository(
                         id = item.snippet.resourceId.videoId,
                         title = item.snippet.title,
                         publishedAt = item.snippet.publishedAt,
-                        thumbnailUrl = item.snippet.thumbnails.default.url
+                        thumbnailUrl = item.snippet.thumbnails.default.url,
+                        channelId = channelId
                     )
                 }
                 db.videoDao().insertAll(list)
