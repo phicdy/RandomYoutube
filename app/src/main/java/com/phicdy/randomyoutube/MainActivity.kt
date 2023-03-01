@@ -15,11 +15,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -90,6 +92,10 @@ fun VideoList(
     onSyncButtonClicked: () -> Unit,
     selectedVideos: List<Video>
 ) {
+    val listState = rememberLazyListState()
+    LaunchedEffect(selectedVideos) {
+        listState.scrollToItem(0)
+    }
     Column {
         Row(modifier = Modifier.padding(8.dp)) {
             Button(
@@ -119,7 +125,7 @@ fun VideoList(
                 )
             }
         }
-        LazyColumn {
+        LazyColumn(state = listState) {
             itemsIndexed(
                 items = selectedVideos.ifEmpty { videos },
                 key = { index, video -> "$index${video.id}" }
@@ -127,7 +133,9 @@ fun VideoList(
                 Column(Modifier.padding(4.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         AsyncImage(
-                            modifier = modifier.width(96.dp).height(96.dp),
+                            modifier = modifier
+                                .width(96.dp)
+                                .height(96.dp),
                             model = video.thumbnailUrl,
                             contentDescription = null
                         )
